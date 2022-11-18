@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>TEST</h1>
+    <button id="GET">
+        GET
+    </button>
+
+    <input type="text" id="delID">
+    <button id="DELETE">
+        DELETE
+    </button>
+
+
+    <input type="text" id="name">
+    <input type="text" id="gender">
+    <input type="text" id="nickname">
+    <button id="ADD">
+        ADD
+    </button>
+    <button id="LOGIN">
+        LOGIN
+    </button>
+    <script>
+        const btnGet = document.querySelector('#GET')
+
+        btnGet.addEventListener('click', function () {
+            fetch('http://127.0.0.1:5000/school')
+                .then(function (res) {
+                    return res.json();
+                })
+                .then((data) => {
+
+                    if (data.success) {
+                        if (data.result.length > 0) {
+                            // 迴圈
+                            // `card${data}`
+                        }
+
+                    }
+                    console.log(data)
+
+                    console.log(data.result);
+                    console.log(data.info);
+                    console.log(data.success);
+
+                })
+        })
+
+        const delID = document.querySelector('#delID')
+        const btnDel = document.querySelector('#DELETE')
+
+        btnDel.addEventListener('click', function () {
+            console.log('delID', delID.value);
+            fetch(`http://127.0.0.1:5000/school/${delID.value}`, {
+                method: 'DELETE'
+            })
+                .then(function (res) {
+                    return res.json();
+                })
+                .then((result) => console.log(result))
+
+        })
+
+
+        const name = document.querySelector('#name')
+        const gender = document.querySelector('#gender')
+        const nickname = document.querySelector('#nickname')
+        const btnAdd = document.querySelector('#ADD')
+
+        btnAdd.addEventListener('click', function () {
+            console.log('name', name.value);
+            console.log('gender', gender.value);
+            console.log('nickname', nickname.value);
+            fetch(`http://127.0.0.1:5000/newStudent`, {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ name: name.value, gender: gender.value, nickname: nickname.value })
+            })
+                .then(function (res) {
+                    return res.json();
+                })
+                .then((result) => console.log(result))
+
+        })
+
+        const btnLogin = document.querySelector('#LOGIN')
+        btnLogin.addEventListener('click', function () {
+            console.log('name', name.value);
+            console.log('nickname', nickname.value);
+            fetch(`http://127.0.0.1:5000/login`, {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ name: name.value, nickname: nickname.value })
+            })
+                .then(function (res) {
+                    return res.json();
+                })
+                .then((result) => console.log(result))
+
+        })
+    </script>
+</body>
+
+</html>

@@ -9,104 +9,230 @@
 </head>
 
 <body>
-    <h1>TEST</h1>
-    <button id="GET">
-        GET
-    </button>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h2>C</h2>
+                <p>採用自動流水號新增一名學生</p>
+                <form id="createdForm">
+                    <label>createName:</label>
+                    <input name="s_name" type="text">
+                    <label>createGender:</label>
+                    <select name="s_gender">
+                        <option value="" style="display: none">請選擇</option>
+                        <option value="女">女</option>
+                        <option value="男">男</option>
+                    </select>
+                    <label>createNickname:</label>
+                    <input name="s_nickname" type="text">
+                    <button id="btnCreated">新增學生</button>
+                </form>
+            </div>
+            <div class="col">
+                <h2>R</h2>
+                <p>可輸入任意欄位搜尋，使用 OR 做綜合條件查詢：</p>
+                <form id="readForm">
+                    <label>s_id:</label>
+                    <input name="s_id" type="text">
+                    <label>Name:</label>
+                    <input name="s_name" type="text">
+                    <label>Gender:</label>
+                    <select name="s_gender">
+                        <option value="" style="display: none">請選擇</option>
+                        <option value="女">女</option>
+                        <option value="男">男</option>
+                    </select>
+                    <label>nickname:</label>
+                    <input name="s_nickname" type="text">
+                    <button id="btnRead">查詢</button>
+                </form>
+                <div id="readResult">
 
-    <input type="text" id="delID">
-    <button id="DELETE">
-        DELETE
-    </button>
+                </div>
+            </div>
+            <div class="col">
+                <h2>U</h2>
+                <p>指定 id 更新該位學生的資料</p>
+                <form id="updatedForm">
+                    <label>s_id(必填):</label>
+                    <input name="s_id" type="text">
+                    <label>Name:</label>
+                    <input name="s_name" type="text">
+                    <label>Gender:</label>
+                    <select name="s_gender">
+                        <option value="" style="display: none">請選擇</option>
+                        <option value="女">女</option>
+                        <option value="男">男</option>
+                    </select>
+                    <label>Nickname:</label>
+                    <input name="s_nickname" type="text">
+                    <button id="btnUpdate">更新學生資料</button>
+                </form>
+            </div>
+            <div class="col">
+                <h2>D</h2>
+                <p>符合其中一項即刪除該學生資料</p>
+                <form id="deletedForm">
+                    <label>s_id:</label>
+                    <input name="s_id" type="text">
+                    <label>Name:</label>
+                    <input name="s_name" type="text">
+                    <label>Gender:</label>
+                    <select name="s_gender">
+                        <option value="" style="display: none">請選擇</option>
+                        <option value="女">女</option>
+                        <option value="男">男</option>
+                    </select>
+                    <label>Nickname:</label>
+                    <input name="s_nickname" type="text">
+                    <button id="btnDelete">刪除學生資料</button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-
-    <input type="text" id="name">
-    <input type="text" id="gender">
-    <input type="text" id="nickname">
-    <button id="ADD">
-        ADD
-    </button>
-    <button id="LOGIN">
-        LOGIN
-    </button>
     <script>
-        const btnGet = document.querySelector('#GET')
+        const btnCreated = document.querySelector('#btnCreated')
+        const createdForm = document.querySelector('#createdForm')
 
-        btnGet.addEventListener('click', function () {
-            fetch('http://127.0.0.1:5000/school')
+        btnCreated.addEventListener('click', function (event) {
+            event.preventDefault()
+
+
+            var obj = {};
+            var formData = new FormData(createdForm);
+            for (var key of formData.keys()) {
+                obj[key] = formData.get(key);
+            }
+
+
+            const name = document.querySelector('#createName')
+            const gender = document.querySelector('#createGender')
+            const nickname = document.querySelector('#createNickname')
+            fetch(`http://127.0.0.1:5000/newStudent`, {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify(obj)
+            })
+                .then(function (res) {
+                    return res.json();
+                })
+                .then((result) => {
+                    console.log(result)
+                    if (result.success) {
+                        alert('新增成功')
+                    }
+                })
+        })
+
+        const btnRead = document.querySelector('#btnRead')
+        const readForm = document.querySelector('#readForm')
+
+        btnRead.addEventListener('click', function (event) {
+            event.preventDefault()
+
+            const formData = Array.from(
+                new FormData(readForm),
+                function (e) { return e.map(encodeURIComponent).join('='); }
+            ).join('&')
+
+
+            // const name = document.querySelector('#createName')
+            // const gender = document.querySelector('#createGender')
+            // const nickname = document.querySelector('#createNickname')
+            fetch(`http://127.0.0.1:5000/school/read?${formData}`, {
+                method: 'GET',
+            })
                 .then(function (res) {
                     return res.json();
                 })
                 .then((data) => {
-
+                    console.log(data)
                     if (data.success) {
-                        if (data.result.length > 0) {
-                            // 迴圈
-                            // `card${data}`
+
+                        let html = `<h2>Read Result:</h2>
+                        <table style="border:1px solid #000;">
+                        `;
+
+                        for (studentInfoArray of data.result) {
+                            html += `<tr>
+                        <td  style="border:1px solid #000;">ID:${studentInfoArray[0]}</td>
+                        <td  style="border:1px solid #000;">名字：${studentInfoArray[1]}</td>
+                        <td  style="border:1px solid #000;">性別：${studentInfoArray[2]}</td>
+                        <td  style="border:1px solid #000;">暱稱：${studentInfoArray[3]}</td>
+                    </tr>`
                         }
 
+                        html += `</table>`
+
+                        document.querySelector('#readResult').innerHTML = html;
+
+                    } else {
+                        document.querySelector('#readResult').innerHTML = '';
+                        alert('查無資料')
                     }
+                })
+        })
+
+
+        const btnUpdate = document.querySelector('#btnUpdate')
+        const updatedForm = document.querySelector('#updatedForm')
+
+        btnUpdate.addEventListener('click', function (event) {
+            event.preventDefault()
+
+            var obj = {};
+            var formData = new FormData(updatedForm);
+            for (var key of formData.keys()) {
+                obj[key] = formData.get(key);
+            }
+
+            const idInput = document.querySelector('#updatedForm input[name="s_id"]')
+
+            fetch(`http://127.0.0.1:5000/school/update/${idInput.value}`, {
+                method: 'PUT',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify(obj)
+            })
+                .then(function (res) {
+                    return res.json();
+                })
+                .then((data) => {
                     console.log(data)
-
-                    console.log(data.result);
-                    console.log(data.info);
-                    console.log(data.success);
-
+                    alert(data.info)
                 })
         })
 
-        const delID = document.querySelector('#delID')
-        const btnDel = document.querySelector('#DELETE')
 
-        btnDel.addEventListener('click', function () {
-            console.log('delID', delID.value);
-            fetch(`http://127.0.0.1:5000/school/${delID.value}`, {
-                method: 'DELETE'
-            })
-                .then(function (res) {
-                    return res.json();
-                })
-                .then((result) => console.log(result))
+        const btnDelete = document.querySelector('#btnDelete')
+        const deletedForm = document.querySelector('#deletedForm')
 
-        })
+        btnDelete.addEventListener('click', function (event) {
+            event.preventDefault()
 
+            var obj = {};
+            var formData = new FormData(deletedForm);
+            for (var key of formData.keys()) {
+                obj[key] = formData.get(key);
+            }
 
-        const name = document.querySelector('#name')
-        const gender = document.querySelector('#gender')
-        const nickname = document.querySelector('#nickname')
-        const btnAdd = document.querySelector('#ADD')
+            const idInput = document.querySelector('#deletedForm input[name="s_id"]')
 
-        btnAdd.addEventListener('click', function () {
-            console.log('name', name.value);
-            console.log('gender', gender.value);
-            console.log('nickname', nickname.value);
-            fetch(`http://127.0.0.1:5000/newStudent`, {
-                method: 'POST',
+            fetch(`http://127.0.0.1:5000/school/delete/${idInput.value}`, {
+                method: 'DELETE',
                 headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ name: name.value, gender: gender.value, nickname: nickname.value })
+                body: JSON.stringify(obj)
             })
                 .then(function (res) {
                     return res.json();
                 })
-                .then((result) => console.log(result))
-
-        })
-
-        const btnLogin = document.querySelector('#LOGIN')
-        btnLogin.addEventListener('click', function () {
-            console.log('name', name.value);
-            console.log('nickname', nickname.value);
-            fetch(`http://127.0.0.1:5000/login`, {
-                method: 'POST',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ name: name.value, nickname: nickname.value })
-            })
-                .then(function (res) {
-                    return res.json();
+                .then((data) => {
+                    console.log(data)
+                    alert(data.info)
                 })
-                .then((result) => console.log(result))
-
         })
+
+
     </script>
 </body>
 

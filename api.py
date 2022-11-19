@@ -5,6 +5,11 @@ import pymysql
 
 app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False
+
+# 這裡設定 DEBUG 為 TRUE 的話，更新程式碼就不用一直重啟 flask 伺服器了
+# 更新 python 程式碼存檔之後，直接重新整理網頁即可。
+app.config['DEBUG']=True
+
 CORS(app, resources={r"./*":{"origins":["*"]}})
 
 db = pymysql.connect(
